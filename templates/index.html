@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>AI Shortify</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+</head>
+<body>
+  <div class="container">
+    <input type="text" placeholder="Paste your text or URL" class="input-btn" id="inputText" />
+    <button class="shrt-btn" id="shortifyBtn">Shortify</button>
+  </div>
+
+  <script>
+  const btn = document.getElementById('shortifyBtn');
+  const input = document.getElementById('inputText');
+  const container = document.querySelector('.container');
+
+  btn.addEventListener('click', async () => {
+    const text = input.value.trim();
+    if (!text) {
+      alert('Please enter some text');
+      return;
+    }
+
+    container.innerHTML = '<p class="load-txt">Loading...</p>';
+
+    try {
+      const res = await fetch('/shortify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text })
+      });
+
+      const data = await res.json();
+      if (data.error) {
+        container.innerHTML = `<p style="color:red;">Error: ${data.error}</p>`;
+      } else {
+        container.innerHTML = `<p class="answer-txt" style="white-space: pre-wrap;">${data.result}</p>`;
+      }
+    } catch (e) {
+      container.innerHTML = `<p style="color:red;">Network error</p>`;
+    }
+  });
+</script>
+</body>
+</html>
